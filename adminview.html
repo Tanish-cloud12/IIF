@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin • Tech Fest Registrations</title>
+  <style>
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:#f7f9fc;
+      color:#222;
+    }
+    header{
+      background:#2a4d8f;
+      padding:15px;
+      color:#fff;
+      text-align:center;
+    }
+    header h1{margin:0;font-size:22px;}
+    .container{
+      max-width:1000px;
+      margin:30px auto;
+      padding:20px;
+      background:#fff;
+      border-radius:8px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+    }
+    th,td{
+      padding:10px;
+      border:1px solid #ddd;
+      text-align:left;
+      font-size:14px;
+    }
+    th{
+      background:#2a4d8f;
+      color:#fff;
+    }
+    tr:nth-child(even){background:#f9f9f9;}
+    .clear-btn{
+      margin-top:15px;
+      padding:10px 15px;
+      background:#c62828;
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+    .clear-btn:hover{background:#b71c1c;}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Tech Fest Registrations (Admin View)</h1>
+  </header>
+
+  <div class="container">
+    <table id="registrationsTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>College</th>
+          <th>Event</th>
+          <th>Notes</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button class="clear-btn" onclick="clearRegistrations()">🗑️ Clear All Registrations</button>
+  </div>
+
+  <script>
+    const tableBody = document.querySelector("#registrationsTable tbody");
+
+    // Load all registrations from localStorage
+    function loadRegistrations(){
+      tableBody.innerHTML = "";
+      const keys = Object.keys(localStorage).filter(k => k.startsWith("registration_"));
+      if(keys.length === 0){
+        tableBody.innerHTML = "<tr><td colspan='6' style='text-align:center;color:#555;'>No registrations found</td></tr>";
+        return;
+      }
+      keys.sort(); // sort by time
+      keys.forEach(key=>{
+        const data = JSON.parse(localStorage.getItem(key));
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${data.name}</td>
+          <td>${data.email}</td>
+          <td>${data.college}</td>
+          <td>${data.event}</td>
+          <td>${data.notes || "-"}</td>
+          <td>${new Date(parseInt(key.split("_")[1])).toLocaleString()}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function clearRegistrations(){
+      if(confirm("Are you sure you want to delete all registrations?")){
+        Object.keys(localStorage).forEach(key=>{
+          if(key.startsWith("registration_")){
+            localStorage.removeItem(key);
+          }
+        });
+        loadRegistrations();
+      }
+    }
+
+    loadRegistrations();
+  </script>
+</body>
+</html>
